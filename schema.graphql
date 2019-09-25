@@ -59,18 +59,23 @@ type RegisterEventEntity @entity{
   timestamp: BigInt
 }
 
-
-type FinalizeEventEntity @entity{
-  id: ID!
-  maps: [BigInt!]
-  payout: BigInt
-  endedAt: BigInt
-  timestamp: BigInt
-}
-
 type WithdrawEventEntity @entity{
   id: ID!
   address: Bytes
   payout: BigInt
+  timestamp: BigInt
+}
+
+type UpdateParticipantLimitEntity @entity{
+  id: ID!
+  limit: BigInt
+  timestamp: BigInt
+}
+
+type FinalizeEventEntity @entity{
+  id: ID!
+  maps: [BigInt!]!
+  payout: BigInt!
+  endedAt: BigInt!
   timestamp: BigInt
 }

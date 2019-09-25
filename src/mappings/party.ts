@@ -1,12 +1,15 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { BigInt, Bytes} from "@graphprotocol/graph-ts"
+import {
+  Party as PartyContract,
+} from "../../generated/templates"
 import {
   Party as PartyContract,
   RegisterEvent,
   WithdrawEvent,
   UpdateParticipantLimit,
-  FinalizeEvent
+  FinalizeEvent,
 } from "../../generated/templates/Party/Party"
-import { MoneyEntity, MetaEntity, StatsEntity } from "../../generated/schema"
+import { MoneyEntity, MetaEntity, StatsEntity, UpdateParticipantLimitEntity, FinalizeEventEntity } from "../../generated/schema"
 import { log } from '@graphprotocol/graph-ts'
 
 const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -65,7 +68,7 @@ export function handleRegisterEvent(event: RegisterEvent): void {
   log.warning(
     '*** handleRegisterEvent: {}, block hash: {}, transaction hash: {}',
     [
-      event.block.number.toString(),       // "47596000"
+      event.block.number.toHexString(),       // "47596000"
       event.block.hash.toHexString(),      // "0x..."
       event.transaction.hash.toHexString() // "0x..."
     ]
@@ -136,7 +139,27 @@ export function handleWithdrawEvent(event: WithdrawEvent): void {
 }
 
 export function handleUpdateParticipantLimit(event: UpdateParticipantLimit): void {
+  let id = event.transaction.hash.toHex()
+  let contract = PartyContract.bind(event.address)
+  let entity = UpdateParticipantLimitEntity.load(id)
+  if (entity == null) {
+    entity = new UpdateParticipantLimitEntity(id)
+    entity.limit = contract.limitOfParticipants().toI32() as BigInt | null
+    entity.timestamp = event.block.timestamp
+    entity.save()
+  }
 }
 
 export function handleFinalizeEvent(event: FinalizeEvent): void {
+  let id = event.transaction.hash.toHex()
+  let contract = PartyContract.bind(event.address)
+  let entity = FinalizeEventEntity.load(id)
+  if (entity == null) {
+    entity = new FinalizeEventEntity(id)
+    entity.maps = event.params.maps
+    entity.payout = event.params.payout
+    entity.endedAt = event.params.endedAt
+    entity.timestamp = event.block.timestamp
+    entity.save()
+  }
 }
