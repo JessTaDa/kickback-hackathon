@@ -3,7 +3,8 @@ import {
   Party as PartyContract,
   RegisterEvent,
   WithdrawEvent,
-  UpdateParticipantLimit
+  UpdateParticipantLimit,
+  FinalizeEvent
 } from "../../generated/templates/Party/Party"
 import { MoneyEntity, MetaEntity, StatsEntity } from "../../generated/schema"
 import { log } from '@graphprotocol/graph-ts'
@@ -135,5 +136,7 @@ export function handleWithdrawEvent(event: WithdrawEvent): void {
 }
 
 export function handleUpdateParticipantLimit(event: UpdateParticipantLimit): void {
+}
 
+export function handleFinalizeEvent(event: FinalizeEvent): void {
 }

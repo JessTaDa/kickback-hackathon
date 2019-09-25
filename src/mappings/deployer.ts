@@ -1,20 +1,13 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { EthereumBlock, EthereumCall, Bytes, BigInt, log } from "@graphprotocol/graph-ts"
 import { DeployCall } from '../../generated/Deployer/Deployer'
-import {
-  NewParty
-} from "../../generated/Deployer/Deployer"
-import { PartyEntity, MetaEntity } from "../../generated/schema"
+import { NewParty, OwnershipTransferred } from "../../generated/Deployer/Deployer"
+import { PartyEntity, MetaEntity, OwnershipTransferredEntity } from "../../generated/schema"
 import {
   Party as PartyContract,
 } from "../../generated/templates"
 import {
   Party as PartyBindingContract,
 } from "../../generated/templates/Party/Party"
-
-
-import { EthereumCall } from '@graphprotocol/graph-ts'
-import { EthereumBlock } from '@graphprotocol/graph-ts'
-import { log } from '@graphprotocol/graph-ts'
 
 export function handleNewParty(event: NewParty): void {
   log.warning(
@@ -25,7 +18,7 @@ export function handleNewParty(event: NewParty): void {
       event.transaction.hash.toHexString() // "0x..."
     ]
   );
-  
+
   // Creating dynamic source
   PartyContract.create(event.params.deployedAddress)
   let party = PartyBindingContract.bind(event.params.deployedAddress)
@@ -36,16 +29,24 @@ export function handleNewParty(event: NewParty): void {
   let meta = MetaEntity.load('')
   if(meta){
     meta.numParties = meta.numParties + 1
-    meta.numMoneyTransactions =  meta.numMoneyTransactions + 1 
+    meta.numMoneyTransactions =  meta.numMoneyTransactions + 1
     meta.limitOfParticipants = meta.limitOfParticipants + limitOfParticipants
   }else{
     meta = new MetaEntity('')
     meta.numParties = 1
     meta.numMoneyTransactions = 0
     meta.limitOfParticipants = limitOfParticipants
-  }  
+  }
   meta.save()
-
   // UpdateParticipantLimit
 }
 
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {
+  let id = event.transaction.hash.toHex()
+  let OwnershipTransfer = new OwnershipTransferredEntity(id)
+  OwnershipTransfer.senderAddress = event.params.previousOwner.toHex() as Bytes | null
+  OwnershipTransfer.recipientAddress = event.params.newOwner.toHex() as Bytes | null
+  OwnershipTransfer.amount = event.transaction.hash.toHexString() as BigInt | null
+  OwnershipTransfer.timestamp = event.block.timestamp
+  OwnershipTransfer.save()
+}

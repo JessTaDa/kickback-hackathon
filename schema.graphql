@@ -37,8 +37,40 @@ type MoneyEntity @entity{
   partyAddress: Bytes
   userAddress: Bytes
   tokenAddress: Bytes
-  amount:BigInt
+  amount: BigInt
   direction: String
   blockNumber: Int
+  timestamp: BigInt
+}
+
+type OwnershipTransferredEntity @entity{
+  id: ID!
+  senderAddress: Bytes
+  recipientAddress: Bytes
+  tokenAddress: Bytes
+  amount: BigInt
+  timestamp: BigInt
+}
+
+type RegisterEventEntity @entity{
+  id: ID!
+  address: Bytes
+  index: BigInt
+  timestamp: BigInt
+}
+
+
+type FinalizeEventEntity @entity{
+  id: ID!
+  maps: [BigInt!]
+  payout: BigInt
+  endedAt: BigInt
+  timestamp: BigInt
+}
+
+type WithdrawEventEntity @entity{
+  id: ID!
+  address: Bytes
+  payout: BigInt
   timestamp: BigInt
 }
