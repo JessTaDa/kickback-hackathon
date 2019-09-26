@@ -1,6 +1,5 @@
 import { EthereumBlock, EthereumCall, Bytes, BigInt, log } from "@graphprotocol/graph-ts"
-import { DeployCall } from '../../generated/Deployer/Deployer'
-import { NewParty, OwnershipTransferred } from "../../generated/Deployer/Deployer"
+import { DeployCall, NewParty, OwnershipTransferred } from "../../generated/Deployer/Deployer"
 import { PartyEntity, MetaEntity, OwnershipTransferredEntity } from "../../generated/schema"
 import {
   Party as PartyContract,
@@ -43,10 +42,13 @@ export function handleNewParty(event: NewParty): void {
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let id = event.transaction.hash.toHex()
-  let OwnershipTransfer = new OwnershipTransferredEntity(id)
-  OwnershipTransfer.senderAddress = event.params.previousOwner.toHex() as Bytes | null
-  OwnershipTransfer.recipientAddress = event.params.newOwner.toHex() as Bytes | null
-  OwnershipTransfer.amount = event.transaction.hash.toHexString() as BigInt | null
-  OwnershipTransfer.timestamp = event.block.timestamp
-  OwnershipTransfer.save()
+  let entity = OwnershipTransferredEntity.load(id)
+  if(entity == null) {
+    entity = new OwnershipTransferredEntity(id)
+    entity.senderAddress = event.params.previousOwner.toHex() as Bytes | null
+    entity.recipientAddress = event.params.newOwner.toHex() as Bytes | null
+    entity.amount = event.transaction.hash.toHexString() as BigInt | null
+    entity.timestamp = event.block.timestamp
+    entity.save()
+  }
 }

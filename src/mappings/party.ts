@@ -152,7 +152,6 @@ export function handleUpdateParticipantLimit(event: UpdateParticipantLimit): voi
 
 export function handleFinalizeEvent(event: FinalizeEvent): void {
   let id = event.transaction.hash.toHex()
-  let contract = PartyContract.bind(event.address)
   let entity = FinalizeEventEntity.load(id)
   if (entity == null) {
     entity = new FinalizeEventEntity(id)
